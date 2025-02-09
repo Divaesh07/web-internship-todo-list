@@ -1,37 +1,9 @@
-# Todo App (Express + React + MySQL)
-> A Full Stack (Node/Express + React) CRUD Todo App, connected with a MySQL database.
-> 
-> Live demo [_here_](https://helpful-dragon-d4e50a.netlify.app/).
+# Web Internship Todo List
 
-## Table of contents
+This is a full-stack Todo List application built using **React, Node.js, Express, and MySQL**.
 
-* [General info](#general-info)
-* [Technologies](#technologies)
-
-## General info
-
-A full stack application (Node/Express + React) CRUD Todo App, connected mith a MySQL database.
-The backend API of this application is hosted on Heroku, and the frontend is deployed on Netlify.
-
-Thanks to the app, you can manage your daily tasks.
-
-You can:
-
-- add tasks,
-- edit tasks,
-- delete tasks
-
-## Technologies
-
-Project is created with:
-
-Backend:
-
-- Node
-- Express
-- MySQL
-
-Frontend:
-
-- React
-- Bootstrap 5
+## Features
+- ✅ Add, update, and delete todos
+- 🗂️ Persistent storage using MySQL
+- 🚀 REST API with Express.js
+- 🎨 Responsive UI built with React
