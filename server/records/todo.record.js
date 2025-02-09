@@ -1,5 +1,5 @@
-const {v4: uuid} = require('uuid');
-const {pool} = require('../utils/db');
+const { v4: uuid } = require('uuid');
+const { pool } = require('../utils/db');
 
 class TodoRecord {
   constructor(obj) {
@@ -9,7 +9,7 @@ class TodoRecord {
       );
     }
 
-    this.id = obj.id;
+    this.id = obj.id || null; // Allow `id` to be NULL (MySQL will auto-generate if `AUTO_INCREMENT`)
     this.todo = obj.todo;
   }
 
@@ -20,39 +20,28 @@ class TodoRecord {
 
   static async getOne(id) {
     const [results] = await pool.execute(
-      'SELECT * FROM `todos` WHERE `id` = :id',
-      {
-        id,
-      }
+      'SELECT * FROM `todos` WHERE `id` = ?',
+      [id]
     );
     return results.length === 0 ? null : new TodoRecord(results[0]);
   }
 
   async insert() {
-    if (!this.id) {
-      this.id = uuid();
-    }
-
-    await pool.execute('INSERT INTO `todos`(`id`,`todo`) VALUES(:id, :todo)', {
-      id: this.id,
-      todo: this.todo,
-    });
-
-    return this.id;
+    await pool.execute('INSERT INTO `todos`(`todo`) VALUES(?)', [this.todo]);
   }
 
   async update(id, todo) {
-    await pool.execute('UPDATE `todos` SET `todo` = :todo WHERE `id` = :id', {
-      id,
+    await pool.execute('UPDATE `todos` SET `todo` = ? WHERE `id` = ?', [
       todo,
-    });
+      id,
+    ]);
   }
 
   async delete() {
-    await pool.execute('DELETE FROM `todos` WHERE `id` = :id', {
-      id: this.id,
-    });
-  }
+    if (!this.id) throw new Error("Cannot delete: ID is missing.");
+    await pool.execute('DELETE FROM `todos` WHERE `id` = ?', [this.id]);
+}
+
 }
 
 module.exports = {

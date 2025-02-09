@@ -1,9 +1,11 @@
 const express = require('express');
 const cors = require('cors');
-const {TodoRouter} = require('./routers/todos');
+const { TodoRouter } = require('./routers/todos');
 require('./utils/db');
 
 const app = express();
+
+console.log("Starting server...");
 
 app.use(cors());
 app.use(express.json());

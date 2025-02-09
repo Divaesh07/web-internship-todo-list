@@ -1,27 +1,63 @@
-const {Router} = require('express');
-const {TodoRecord} = require('../records/todo.record');
-const {pool} = require('../utils/db');
+const { Router } = require('express');
+const { TodoRecord } = require('../records/todo.record');
 
 const TodoRouter = Router();
 
-TodoRouter.get('/', async (req, res) => {
-  const todosList = await TodoRecord.listAll();
+TodoRouter
+  .get('/', async (req, res) => {
+    try {
+      const todosList = await TodoRecord.listAll();
+      res.json(todosList);
+    } catch (error) {
+      console.error("Error fetching todos:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  })
 
-  res.send(todosList);
-})
   .post('/create', async (req, res) => {
-    const newTodo = new TodoRecord(req.body);
-    await newTodo.insert();
+    try {
+      const newTodo = new TodoRecord(req.body);
+      await newTodo.insert();
+      res.status(201).json({ message: "Todo created successfully!" });
+    } catch (error) {
+      console.error("Error creating todo:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  })
 
-    res.send('Values inserted successfully');
+  .delete('/delete/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const todo = await TodoRecord.getOne(id);
+
+      if (!todo) {
+        return res.status(404).json({ error: "Todo not found" });
+      }
+
+      await todo.delete();
+      res.json({ message: "Todo deleted successfully!" });
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   })
-  .delete('/:id', async (req, res) => {
-    const todo = await TodoRecord.getOne(req.params.id);
-    await todo.delete();
-  })
+
   .put('/update/:id', async (req, res) => {
-    const todo = await TodoRecord.getOne(req.params.id);
-    await todo.update(req.body.id, req.body.todo);
+    try {
+      const { id } = req.params;
+      const { todo } = req.body;
+
+      const existingTodo = await TodoRecord.getOne(id);
+      if (!existingTodo) {
+        return res.status(404).json({ error: "Todo not found" });
+      }
+
+      await existingTodo.update(id, todo);
+      res.json({ message: "Todo updated successfully!" });
+    } catch (error) {
+      console.error("Error updating todo:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   });
 
 module.exports = {
